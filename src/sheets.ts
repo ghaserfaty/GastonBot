@@ -28,13 +28,17 @@ async function authenticate() {
 export const appendExpenseToSheet = async (user: string, expense: Expense) => {
     const sheets = await authenticate();
     const usdValue = await getBlueDollarRate();
+    let usdAmount = 0
+    if(usdValue){
+      usdAmount = expense.amount / usdValue;
+    }
   
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_NAME}!A1`,
       valueInputOption: "RAW",
       requestBody: {
-        values: [[user, expense.category, expense.timestamp,expense.amount, usdValue]],
+        values: [[user, expense.category, expense.timestamp,expense.amount, usdValue, usdAmount]],
       },
     });
   };
