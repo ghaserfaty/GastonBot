@@ -1,6 +1,7 @@
 import { GoogleAuth } from 'google-auth-library';
 import { sheets_v4 } from '@googleapis/sheets';
 import { Expense } from "./types/Expense";
+import axios from 'axios';
 
 
 const SPREADSHEET_ID = "1bY081aIOrp9YUsNniatAWtX_JhMWGArFJuAaELKkjNs";
@@ -26,13 +27,25 @@ async function authenticate() {
 
 export const appendExpenseToSheet = async (user: string, expense: Expense) => {
     const sheets = await authenticate();
+    const usdValue = await getBlueDollarRate();
   
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_NAME}!A1`,
       valueInputOption: "RAW",
       requestBody: {
-        values: [[user, expense.category, expense.timestamp,expense.amount]],
+        values: [[user, expense.category, expense.timestamp,expense.amount, usdValue]],
       },
     });
   };
+
+
+  async function getBlueDollarRate(): Promise<number | null> {
+    try {
+      const response = await axios.get('https://api.bluelytics.com.ar/v2/latest');
+      return response.data.blue.value_buy; // o value_avg, según prefieras
+    } catch (error) {
+      console.error('Error al obtener la cotización del dólar:', error);
+      return null;
+    }
+  }
