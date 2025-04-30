@@ -1,39 +1,45 @@
-import TelegramBot from "node-telegram-bot-api";
+import TelegramBot, { Message } from 'node-telegram-bot-api';
+import { Expense } from './types/Expense';
+import { appendExpenseToSheet } from './sheets';
+import dotenv from 'dotenv';  // Importa dotenv
+dotenv.config();  // Carga las variables de entorno desde el archivo .env
 
-// Reemplazá con tu token de BotFather
-const token: string = process.env.BOT_TOKEN ?? "";
 
-const bot = new TelegramBot(token, { polling: true });
+const token: string = process.env.BOT_TOKEN ?? '';
 
-type Expense = {
-  category: string;
-  amount: number;
-  timestamp: Date;
-};
-const expenses: Expense[] = [];
+console.log(`token: ${token}`)
+const bot = new TelegramBot(token, {  polling: true });
+
 const pendingAmounts = new Map<number, number>(); // chatId -> amount
 
 const categories = [
-  { label: "🍔 Comida", value: "Comida" },
-  { label: "🛍️ Compras", value: "Compras" },
+  { label: "🛒 Supermercado", value: "Supermercado" },
+  { label: "🌿 Weed", value: "Weed" },
+  { label: "🍕 Delivery", value: "Delivery" },
+  { label: "📺 Ocio", value: "Ocio" },
   { label: "🚗 Transporte", value: "Transporte" },
-  { label: "🏠 Hogar", value: "Hogar" },
-  { label: "🎉 Ocio", value: "Ocio" },
-  { label: "💼 Trabajo", value: "Trabajo" },
+  { label: "📆 Gastos fijos", value: "Gastos fijos" },
+  { label: "👕 Ropa", value: "Ropa" },
 ];
 
-bot.on("message", (msg: any) => {
+// Manejador de mensajes
+bot.on("message", (msg: Message) => {
+    console.log("BOT MESSAGE")
+    console.log(msg)
+
   const chatId = msg.chat.id;
   const text = msg.text?.trim();
+  console.log(`Mensaje recibido: ${text}`);  // Asegúrate de que lleguen los mensajes
+
 
   if (!text) return;
 
-  // Si es un número, lo tratamos como monto
   const amount = parseFloat(text.replace(",", "."));
 
   if (!isNaN(amount)) {
     pendingAmounts.set(chatId, amount);
-
+    console.log(`por mandar?`);  // Asegúrate de que lleguen los mensajes
+    console.log(bot);
     bot.sendMessage(chatId, "📂 ¿A qué rubro pertenece este gasto?", {
       reply_markup: {
         inline_keyboard: categories.map((cat) => [
@@ -43,16 +49,21 @@ bot.on("message", (msg: any) => {
           },
         ]),
       },
-    });
+    })
+    .then(() => {
+        console.log(`Mensaje enviado a ${chatId}`);  // Para depurar si el mensaje se envió
+      })
+    .catch((error) => {
+        console.error("Error al enviar el mensaje:", error);
+      });
     return;
   }
 
-  // Si no entendemos el mensaje
   bot.sendMessage(chatId, `❌ Mandá solo el monto del gasto, como por ejemplo: 3500`);
 });
 
-// Cuando elige un rubro
-bot.on("callback_query", (query) => {
+// Manejador de selección de rubro
+bot.on("callback_query", async (query) => {
   const chatId = query.message?.chat.id;
   const category = query.data;
 
@@ -67,7 +78,7 @@ bot.on("callback_query", (query) => {
         amount,
         timestamp: new Date(),
       };
-      expenses.push(expense);
+      await appendExpenseToSheet(chatId.toString(), expense);
 
       bot.sendMessage(
         chatId,
@@ -78,7 +89,6 @@ bot.on("callback_query", (query) => {
     }
   }
 
-  // Confirmar el botón
   if (query.id) {
     bot.answerCallbackQuery(query.id);
   }
