@@ -10,16 +10,26 @@ console.log("INICIANDO TELEGRAF");
 const bot = new Telegraf(token);
 
 const pendingAmounts = new Map<number, number>(); // chatId -> amount
-
 const categories = [
-  { label: "🛒 Supermercado", value: "Supermercado" },
-  { label: "🌿 Weed", value: "Weed" },
-  { label: "🍕 Delivery", value: "Delivery" },
-  { label: "📺 Ocio", value: "Ocio" },
-  { label: "🚗 Transporte", value: "Transporte" },
-  { label: "📆 Gastos fijos", value: "Gastos fijos" },
-  { label: "👕 Ropa", value: "Ropa" },
-];
+    { label: "🛒 Supermercado", value: "Supermercado" },
+    { label: "🌿 Weed", value: "Weed" },
+    { label: "🍕 Delivery", value: "Delivery" },
+    { label: "🍽️ Comidas afuera", value: "Comidas afuera" },
+    { label: "📺 Ocio", value: "Ocio" },
+    { label: "🍺 Salidas", value: "Salidas" },
+    { label: "🚗 Transporte", value: "Transporte" },
+    { label: "✈️ Viajes", value: "Viajes" },
+    { label: "📆 Gastos fijos", value: "Gastos fijos" },
+    { label: "🏡 Alquiler / Hipoteca", value: "Alquiler / Hipoteca" },
+    { label: "💊 Farmacia", value: "Farmacia" },
+    { label: "🏋️‍♂️ Salud & Gimnasio", value: "Salud & Gimnasio" },
+    { label: "👕 Ropa", value: "Ropa" },
+    { label: "🎁 Regalos & Donaciones", value: "Regalos & Donaciones" },
+    { label: "📚 Educación", value: "Educación" },
+    { label: "💻 Tecnología", value: "Tecnología" },
+    { label: "🧼 Hogar", value: "Hogar" },
+    { label: "🐾 Mascotas", value: "Mascotas" }
+  ];
 
 // Manejador de mensajes
 bot.on('message', async (ctx) => {
@@ -61,7 +71,7 @@ categories.forEach((cat) => {
     const chatId = ctx.callbackQuery?.message?.chat.id;
     const category = cat.value;
 
-    if (chatId && category) {
+    if (chatId && category && (chatId.toString().includes("1338920278") || chatId.toString().includes("1817312721"))) {
       const amount = pendingAmounts.get(chatId);
 
       if (amount !== undefined) {
