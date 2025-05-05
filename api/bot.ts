@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const token: string = process.env.BOT_TOKEN ?? "";
-console.log("INICIANDO TELEGRAF");
 const bot = new Telegraf(token);
 
 const pendingAmounts = new Map<number, number>(); // chatId -> amount
@@ -26,6 +25,13 @@ const categories = [
   { label: "🧼 Hogar", value: "Hogar" },
   { label: "🐾 Mascotas", value: "Mascotas" },
 ];
+
+bot.telegram.setMyCommands([
+    {
+      command: 'report',
+      description: 'report command',
+    }
+  ]);
 
 // Manejador de mensajes
 bot.on("message", async (ctx) => {
