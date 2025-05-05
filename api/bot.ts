@@ -30,7 +30,7 @@ const categories = [
 // Manejador de mensajes
 bot.on("message", async (ctx) => {
   console.log("Mensaje recibido:", ctx.message);
-  if (!ctx.message || !("text" in ctx.message)) {
+  if (!ctx.message || !("text" in ctx.message) || ctx.message.text.startsWith("/")) {
     return; // Si no es un mensaje de texto, ignora
   }
   const chatId = ctx.chat.id;
@@ -64,10 +64,15 @@ bot.on("message", async (ctx) => {
 });
 
 bot.command("report", async (ctx) => {
-  const chatId = ctx.chat.id;
-
-  const result = await getReport(chatId.toString());
-  ctx.reply(result.toString());
+ try {
+     const chatId = ctx.chat.id;
+   
+     const result = await getReport(chatId.toString());
+     ctx.reply(result.toString());
+ } catch (error) {
+    console.log(error)
+    ctx.reply("error");
+ }
 });
 
 // Manejadores de selección de rubro
