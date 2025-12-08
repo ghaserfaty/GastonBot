@@ -1,21 +1,24 @@
 export const categories = [
     { label: "🛒 Supermercado", value: "Supermercado" },
-    { label: "🌿 Weed", value: "Weed" },
-    { label: "🍕 Delivery", value: "Delivery" },
-    { label: "🍽️ Comidas afuera", value: "Comidas afuera" },
-    { label: "📺 Ocio", value: "Ocio" },
-    { label: "🍺 Salidas", value: "Salidas" },
+    { label: "🍺 Ocio/Salidas", value: "Ocio/Salidas" },
     { label: "🚗 Transporte", value: "Transporte" },
     { label: "💊 Farmacia", value: "Farmacia" },
-    { label: "🏋️‍♂️ Salud & Gimnasio", value: "Salud & Gimnasio" },
     { label: "👕 Ropa", value: "Ropa" },
-    { label: "🎁 Regalos & Donaciones", value: "Regalos & Donaciones" },
-    { label: "📚 Educación", value: "Educación" },
-    { label: "🧼 Hogar", value: "Hogar" },
-    { label: "🐾 Mascotas", value: "Mascotas" },
   ];
-9
-  export const isAllowedUser = (chatId: number) => {
-    const allowedUsers = ["1338920278", "1817312721"];
-    return allowedUsers.indexOf(chatId.toString()) !== -1;
-  }
+
+// Spending limits per category in USD
+export const categoryLimits: Record<string, number> = {
+  "Supermercado": 400,
+  "Ocio/Salidas": 150,
+  "Transporte": 100,
+  "Farmacia": 80,
+  "Ropa": 200,
+};
+
+// Warning threshold percentage (warn when reaching this % of the limit)
+export const WARNING_THRESHOLD = 0.8;
+
+export const isAllowedUser = (chatId: number) => {
+  const allowedUsers = ["1338920278", "1817312721"];
+  return allowedUsers.indexOf(chatId.toString()) !== -1;
+};

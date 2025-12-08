@@ -31,6 +31,54 @@ export const getReport = async (user: string) => {
   return total;
 };
 
+// Get total spending for a specific category in the current month (in USD)
+export const getCategorySpending = async (
+  user: string,
+  category: string
+): Promise<number> => {
+  const sheets = await authenticate();
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: SHEET_NAME,
+  });
+
+  const rows = res.data.values;
+  if (!rows || rows.length === 0) {
+    return 0;
+  }
+
+  const encabezado = rows[0];
+  const datos = rows.slice(1);
+
+  const colUser = encabezado.indexOf("User");
+  const colCategory = encabezado.indexOf("Category");
+  const colAmount = encabezado.indexOf("Amount (USD)");
+  const colTimestamp = encabezado.indexOf("Timestamp");
+
+  // Get current month boundaries
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const total = datos
+    .filter((row) => {
+      const rowUser = row[colUser];
+      const rowCategory = row[colCategory];
+      const rowTimestamp = new Date(row[colTimestamp]);
+
+      return (
+        rowUser === user &&
+        rowCategory === category &&
+        rowTimestamp >= startOfMonth &&
+        rowTimestamp <= endOfMonth
+      );
+    })
+    .reduce((sum, row) => sum + parseFloat(row[colAmount] || 0), 0);
+
+  return total;
+};
+
 async function authenticate() {
   try {
     const credentialsJSON = JSON.parse(process.env.GOOGLE_CREDENTIALS || "");
