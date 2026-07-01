@@ -4,6 +4,8 @@ export const categories = [
     { label: "🚗 Transporte", value: "Transporte" },
     { label: "💊 Farmacia", value: "Farmacia" },
     { label: "👕 Ropa", value: "Ropa" },
+    { label: "🍃 Rosalia", value: "Rosalia" },
+
   ];
 
 // Spending limits per category in USD
@@ -13,6 +15,7 @@ export const categoryLimits: Record<string, number> = {
   "Transporte": 100,
   "Farmacia": 80,
   "Ropa": 200,
+  "Rosalia": 300,
 };
 
 // Warning threshold percentage (warn when reaching this % of the limit)
